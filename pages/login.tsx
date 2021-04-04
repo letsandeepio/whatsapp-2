@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import styled from 'styled-components';
 import Button from '@material-ui/core/Button';
+import { auth, provider } from '../firebase';
 
 const Container = styled.div`
   display: grid;
@@ -25,6 +26,9 @@ const Logo = styled.img`
 `;
 
 const Login = () => {
+  const signIn = () => {
+    auth.signInWithPopup(provider).catch(console.log);
+  };
   return (
     <Container>
       <Head>
@@ -32,7 +36,9 @@ const Login = () => {
       </Head>
       <LoginContainer>
         <Logo src="https://i.pinimg.com/originals/c4/2c/93/c42c9352e2696ce633fc34ae711c2c68.png" />
-        <Button variant="outlined">Sign in with Google</Button>
+        <Button variant="outlined" onClick={signIn}>
+          Sign in with Google
+        </Button>
       </LoginContainer>
     </Container>
   );
