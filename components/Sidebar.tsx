@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import * as EmailValidator from 'email-validator';
 import { useState } from 'react';
 import ProfileMenu from './ProfileMenu';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase';
 
 const Container = styled.div``;
 
@@ -54,6 +56,7 @@ const UserAvatar = styled(Avatar)`
 
 const Sidebar = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [user] = useAuthState(auth);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -75,7 +78,7 @@ const Sidebar = () => {
   return (
     <Container>
       <Header>
-        <UserAvatar onClick={handleClick} />
+        <UserAvatar onClick={handleClick} src={user.photoURL} />
         <IconsContainer>
           <IconButton>
             <ChatIcon />

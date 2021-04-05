@@ -1,7 +1,6 @@
-import { auth } from '../firebase';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import { withStyles } from '@material-ui/core/styles';
+import { auth } from '../firebase';
 
 const ProfileMenu = ({ anchorEl, onClose }) => {
   const handleClose = () => {
