@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 
-const Container = styled.div`
-  display: flex;
-`;
+const Container = styled.div``;
 
-const ChatScreen = () => {
+const ChatScreen = ({ chat, messages }) => {
   return <Container>Hello </Container>;
 };
 

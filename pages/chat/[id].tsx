@@ -1,8 +1,10 @@
 import Head from 'next/head';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import styled from 'styled-components';
 import ChatScreen from '../../components/ChatScreen';
 import Sidebar from '../../components/Sidebar';
-import { db } from '../../firebase';
+import { auth, db } from '../../firebase';
+import { getRecipientEmail } from '../../utils/getRecipientEmail';
 
 const Container = styled.div`
   display: flex;
@@ -19,21 +21,24 @@ const ChatContainer = styled.div`
 `;
 
 const Chat = ({ chat, messages }) => {
+  const [user] = useAuthState(auth);
+  console.log({ chat, messages });
+
   return (
     <Container>
       <Head>
-        <title>Chat</title>
+        <title>Chat with {getRecipientEmail(chat.users, user)}</title>
       </Head>
       <Sidebar />
       <ChatContainer>
-        <ChatScreen />
+        <ChatScreen chat={chat} messages={messages} />
       </ChatContainer>
     </Container>
   );
 };
 
 export const getServerSideProps = async (context) => {
-  const ref = db.collection('users').doc(context.query.id);
+  const ref = db.collection('chats').doc(context.query.id);
   const messagesRes = await ref
     .collection('messages')
     .orderBy('timestamp', 'asc')
@@ -44,7 +49,7 @@ export const getServerSideProps = async (context) => {
       id: doc.id,
       ...doc.data()
     }))
-    .map((message) => ({
+    .map((message: any) => ({
       ...message,
       timestamp: message.timestamp.toDate().getTime()
     }));
