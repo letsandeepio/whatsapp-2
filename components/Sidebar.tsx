@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { auth, db } from '../firebase';
 import ProfileMenu from './ProfileMenu';
 import DialogEmail from './DialogEmail';
+import CustomDialog from './CustomDialog';
 
 const Container = styled.div``;
 
@@ -58,7 +59,13 @@ const UserAvatar = styled(Avatar)`
 const Sidebar = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(false);
+  const [customDialogOpen, setCustomDialogOpen] = useState(false);
+
   const [user] = useAuthState(auth);
+
+  const handleCustomDialogClose = () => {
+    setCustomDialogOpen(false);
+  };
 
   const handleDialogClose = () => {
     setOpen(false);
@@ -77,19 +84,15 @@ const Sidebar = () => {
   };
 
   const handleEmail = (email: string) => {
-    console.log(email);
-  };
-  const createChat = () => {
-    const input = prompt(
-      'Please enter an email address you wish to chat with:'
-    );
-    if (!input) return null;
-    if (true) {
+    if (email === user.email) {
+      window.setTimeout(() => setCustomDialogOpen(true), 1000);
+    } else {
       db.collection('chats').add({
-        users: [user.email, input]
+        users: [user.email, email]
       });
     }
   };
+
   return (
     <Container>
       <Header>
@@ -113,6 +116,11 @@ const Sidebar = () => {
         open={open}
         onClose={handleDialogClose}
         onValidEmail={handleEmail}
+      />
+      <CustomDialog
+        open={customDialogOpen}
+        onClose={handleCustomDialogClose}
+        message="It is nice to talk to yourself sometime, unfortunately this feature is not supported by this app at the moment."
       />
     </Container>
   );
