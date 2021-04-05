@@ -13,6 +13,7 @@ import Message from './Message';
 import MicIcon from '@material-ui/icons/Mic';
 import { useState } from 'react';
 import { getRecipientEmail } from '../utils/getRecipientEmail';
+import TimeAgo from 'timeago-react';
 
 const Container = styled.div``;
 const Header = styled.div`
@@ -70,6 +71,14 @@ const ChatScreen = ({ chat, messages }) => {
   const [input, setInput] = useState('');
   const router = useRouter();
 
+  const recipientEmail = getRecipientEmail(chat.users, user);
+
+  const [recipientSnapshot] = useCollection(
+    db.collection('users').where('email', '==', recipientEmail)
+  );
+
+  const recipient = recipientSnapshot?.docs?.[0]?.data();
+
   const [messagesSnapshot] = useCollection(
     db
       .collection('chats')
@@ -116,15 +125,29 @@ const ChatScreen = ({ chat, messages }) => {
     setInput('');
   };
 
-  const recipientEmail = getRecipientEmail(chat.users, user);
-
   return (
     <Container>
       <Header>
-        <Avatar />
+        {recipient ? (
+          <Avatar src={recipient.photoURL} />
+        ) : (
+          <Avatar>{recipientEmail[0]}</Avatar>
+        )}
+
         <HeaderInfo>
           <h3>{recipientEmail}</h3>
-          <span>Last Seen</span>
+          {recipientSnapshot ? (
+            <span>
+              Last Active:{' '}
+              {recipient?.lastSeen?.toDate() ? (
+                <TimeAgo datetime={recipient?.lastSeen?.toDate()} />
+              ) : (
+                'Unvailable'
+              )}
+            </span>
+          ) : (
+            <span>Loading last active</span>
+          )}
         </HeaderInfo>
         <HeaderIcons>
           <IconButton>

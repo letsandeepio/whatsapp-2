@@ -21,7 +21,6 @@ const ChatContainer = styled.div`
 `;
 
 const Chat = ({ chat, messages }) => {
-  console.log({ chat, messages });
   const [user] = useAuthState(auth);
 
   return (
