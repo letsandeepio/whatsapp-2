@@ -1,12 +1,15 @@
 import { Avatar } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import AttachFileIcon from '@material-ui/icons/AttachFile';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
 import { useRouter } from 'next/router';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCollection } from 'react-firebase-hooks/firestore';
 import styled from 'styled-components';
 import { auth, db } from '../firebase';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import AttachFileIcon from '@material-ui/icons/AttachFile';
-import IconButton from '@material-ui/core/IconButton';
-import { useCollection } from 'react-firebase-hooks/firestore';
+import Message from './Message';
+import MicIcon from '@material-ui/icons/Mic';
 
 const Container = styled.div``;
 const Header = styled.div`
@@ -33,12 +36,58 @@ const HeaderInfo = styled.div`
   }
 `;
 const HeaderIcons = styled.div``;
-const MessagesContainer = styled.div``;
+const MessagesContainer = styled.div`
+  padding: 30px;
+  background-color: #e5ded8;
+  min-height: 90vh;
+`;
 const EndOfMessages = styled.div``;
+const InputContainer = styled.form`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  z-index: 100;
+`;
+const Input = styled.input`
+  flex: 1;
+  outline: 0;
+  border: none;
+  border-radius: 10px;
+  background-color: whitesmoke;
+  padding: 20px;
+  margin-left: 15px;
+  margin-right: 15px;
+`;
 
 const ChatScreen = ({ chat, messages }) => {
   const [user] = useAuthState(auth);
   const router = useRouter();
+
+  const [messagesSnapshot] = useCollection(
+    db
+      .collection('chats')
+      .doc(router.query.id as string)
+      .collection('messages')
+      .orderBy('timestamp', 'asc')
+  );
+
+  const showMessages = () => {
+    if (messagesSnapshot) {
+      return messagesSnapshot.docs.map((message) => (
+        <Message
+          key={message.id}
+          user={message.data().user}
+          message={{
+            ...message.data(),
+            timeStamp: message.data().timestamp?.toDate().getTime()
+          }}
+        />
+      ));
+    }
+  };
 
   return (
     <Container>
@@ -60,6 +109,11 @@ const ChatScreen = ({ chat, messages }) => {
       <MessagesContainer>
         <EndOfMessages />
       </MessagesContainer>
+      <InputContainer>
+        <InsertEmoticonIcon />
+        <Input />
+        <MicIcon />
+      </InputContainer>
     </Container>
   );
 };
