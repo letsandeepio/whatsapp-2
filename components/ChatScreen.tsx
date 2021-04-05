@@ -7,9 +7,11 @@ import { useRouter } from 'next/router';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import styled from 'styled-components';
+import firebase from 'firebase';
 import { auth, db } from '../firebase';
 import Message from './Message';
 import MicIcon from '@material-ui/icons/Mic';
+import { useState } from 'react';
 
 const Container = styled.div``;
 const Header = styled.div`
@@ -64,6 +66,7 @@ const Input = styled.input`
 
 const ChatScreen = ({ chat, messages }) => {
   const [user] = useAuthState(auth);
+  const [input, setInput] = useState('');
   const router = useRouter();
 
   const [messagesSnapshot] = useCollection(
@@ -82,13 +85,35 @@ const ChatScreen = ({ chat, messages }) => {
           user={message.data().user}
           message={{
             ...message.data(),
-            timeStamp: message.data().timestamp?.toDate().getTime()
+            timestamp: message.data().timestamp?.toDate().getTime()
           }}
         />
+      ));
+    } else {
+      return JSON.parse(messages).map((message) => (
+        <Message key={message.id} user={message.user} message={message} />
       ));
     }
   };
 
+  const sendMessage = (e) => {
+    const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+    e.preventDefault();
+    db.collection('users')
+      .doc(user.uid)
+      .set({ lastSeen: timestamp }, { merge: true });
+    db.collection('chats')
+      .doc(router.query.id as string)
+      .collection('messages')
+      .add({
+        timestamp,
+        user: user.email,
+        photoURL: user.photoURL,
+        message: input
+      });
+
+    setInput('');
+  };
   return (
     <Container>
       <Header>
@@ -107,11 +132,15 @@ const ChatScreen = ({ chat, messages }) => {
         </HeaderIcons>
       </Header>
       <MessagesContainer>
+        {showMessages()}
         <EndOfMessages />
       </MessagesContainer>
       <InputContainer>
         <InsertEmoticonIcon />
-        <Input />
+        <Input value={input} onChange={(e) => setInput(e.target.value)} />
+        <button hidden disabled={!input} onClick={sendMessage}>
+          Send Message
+        </button>
         <MicIcon />
       </InputContainer>
     </Container>
