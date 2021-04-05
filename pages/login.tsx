@@ -37,7 +37,7 @@ const Login = () => {
       <LoginContainer>
         <Logo src="https://i.pinimg.com/originals/c4/2c/93/c42c9352e2696ce633fc34ae711c2c68.png" />
         <Button variant="outlined" onClick={signIn}>
-          Sign in with Google
+          Log in with Google
         </Button>
       </LoginContainer>
     </Container>
