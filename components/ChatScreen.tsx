@@ -11,7 +11,7 @@ import firebase from 'firebase';
 import { auth, db } from '../firebase';
 import Message from './Message';
 import MicIcon from '@material-ui/icons/Mic';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { getRecipientEmail } from '../utils/getRecipientEmail';
 import TimeAgo from 'timeago-react';
 
@@ -45,7 +45,9 @@ const MessagesContainer = styled.div`
   background-color: #e5ded8;
   min-height: 90vh;
 `;
-const EndOfMessages = styled.div``;
+const EndOfMessages = styled.div`
+  margin-bottom: 50px;
+`;
 const InputContainer = styled.form`
   display: flex;
   align-items: center;
@@ -67,6 +69,7 @@ const Input = styled.input`
 `;
 
 const ChatScreen = ({ chat, messages }) => {
+  const endOfMessagesRef = useRef(null);
   const [user] = useAuthState(auth);
   const [input, setInput] = useState('');
   const router = useRouter();
@@ -106,6 +109,13 @@ const ChatScreen = ({ chat, messages }) => {
     }
   };
 
+  const scrollToBottom = () => {
+    endOfMessagesRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
   const sendMessage = (e) => {
     const timestamp = firebase.firestore.FieldValue.serverTimestamp();
     e.preventDefault();
@@ -123,6 +133,7 @@ const ChatScreen = ({ chat, messages }) => {
       });
 
     setInput('');
+    scrollToBottom();
   };
 
   return (
@@ -160,7 +171,7 @@ const ChatScreen = ({ chat, messages }) => {
       </Header>
       <MessagesContainer>
         {showMessages()}
-        <EndOfMessages />
+        <EndOfMessages ref={endOfMessagesRef} />
       </MessagesContainer>
       <InputContainer>
         <InsertEmoticonIcon />
