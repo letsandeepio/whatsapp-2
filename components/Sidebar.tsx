@@ -2,12 +2,13 @@ import { Avatar, Button, IconButton } from '@material-ui/core';
 import ChatIcon from '@material-ui/icons/Chat';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchIcon from '@material-ui/icons/Search';
-import styled from 'styled-components';
-import * as EmailValidator from 'email-validator';
+
 import { useState } from 'react';
-import ProfileMenu from './ProfileMenu';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '../firebase';
+import styled from 'styled-components';
+import { auth, db } from '../firebase';
+import ProfileMenu from './ProfileMenu';
+import DialogEmail from './DialogEmail';
 
 const Container = styled.div``;
 
@@ -56,7 +57,16 @@ const UserAvatar = styled(Avatar)`
 
 const Sidebar = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [open, setOpen] = useState(false);
   const [user] = useAuthState(auth);
+
+  const handleDialogClose = () => {
+    setOpen(false);
+  };
+
+  const showDialog = () => {
+    setOpen(true);
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -66,13 +76,18 @@ const Sidebar = () => {
     setAnchorEl(null);
   };
 
+  const handleEmail = (email: string) => {
+    console.log(email);
+  };
   const createChat = () => {
     const input = prompt(
       'Please enter an email address you wish to chat with:'
     );
     if (!input) return null;
-    if (EmailValidator.validate(input)) {
-      //we need to add the chat
+    if (true) {
+      db.collection('chats').add({
+        users: [user.email, input]
+      });
     }
   };
   return (
@@ -92,8 +107,13 @@ const Sidebar = () => {
         <SearchIcon />
         <SearchInput placeholder="Search in chats" />
       </Search>
-      <SidebarChat onClick={createChat}>Start a new chat </SidebarChat>
+      <SidebarChat onClick={showDialog}>Start a new chat </SidebarChat>
       <ProfileMenu anchorEl={anchorEl} onClose={handleClose} />
+      <DialogEmail
+        open={open}
+        onClose={handleDialogClose}
+        onValidEmail={handleEmail}
+      />
     </Container>
   );
 };
