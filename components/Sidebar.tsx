@@ -4,6 +4,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchIcon from '@material-ui/icons/Search';
 import styled from 'styled-components';
 import * as EmailValidator from 'email-validator';
+import { useState } from 'react';
+import ProfileMenu from './ProfileMenu';
 
 const Container = styled.div``;
 
@@ -51,6 +53,16 @@ const UserAvatar = styled(Avatar)`
 `;
 
 const Sidebar = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const createChat = () => {
     const input = prompt(
       'Please enter an email address you wish to chat with:'
@@ -63,7 +75,7 @@ const Sidebar = () => {
   return (
     <Container>
       <Header>
-        <UserAvatar />
+        <UserAvatar onClick={handleClick} />
         <IconsContainer>
           <IconButton>
             <ChatIcon />
@@ -78,6 +90,7 @@ const Sidebar = () => {
         <SearchInput placeholder="Search in chats" />
       </Search>
       <SidebarChat onClick={createChat}>Start a new chat </SidebarChat>
+      <ProfileMenu anchorEl={anchorEl} onClose={handleClose} />
     </Container>
   );
 };
