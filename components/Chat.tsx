@@ -3,8 +3,9 @@ import React from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import styled from 'styled-components';
-import { db, auth } from '../firebase';
+import { auth, db } from '../firebase';
 import { getRecipientEmail } from '../utils/getRecipientEmail';
+import { useRouter } from 'next/router';
 
 const Container = styled.div`
   display: flex;
@@ -23,16 +24,20 @@ const UserAvatar = styled(Avatar)`
 
 const Chat = ({ id, users }) => {
   const [user] = useAuthState(auth);
+  const router = useRouter();
   const recipientEmail = getRecipientEmail(users, user);
   const [recipientSnapshot] = useCollection(
     db.collection('users').where('email', '==', recipientEmail)
   );
   const recipient = recipientSnapshot?.docs?.[0]?.data();
   const userInitial = recipientEmail[0];
-  console.log(recipientEmail);
+
+  const enterChat = () => {
+    router.push(`/chat/${id}`);
+  };
 
   return (
-    <Container>
+    <Container onClick={enterChat}>
       {recipient ? (
         <UserAvatar src={recipient?.photoURL} />
       ) : (
