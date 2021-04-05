@@ -10,6 +10,7 @@ import { auth, db } from '../firebase';
 import CustomDialog from './CustomDialog';
 import DialogEmail from './DialogEmail';
 import ProfileMenu from './ProfileMenu';
+import Chat from './Chat';
 
 const Container = styled.div``;
 
@@ -123,6 +124,9 @@ const Sidebar = () => {
       </Search>
       <SidebarChat onClick={showDialog}>Start a new chat </SidebarChat>
       <ProfileMenu anchorEl={anchorEl} onClose={handleClose} />
+      {chatSnapshots?.docs.map((chat) => (
+        <Chat key={chat.id} id={chat.id} users={chat.data().users} />
+      ))}
       <DialogEmail
         open={open}
         onClose={handleDialogClose}
