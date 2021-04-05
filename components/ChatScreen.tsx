@@ -12,6 +12,7 @@ import { auth, db } from '../firebase';
 import Message from './Message';
 import MicIcon from '@material-ui/icons/Mic';
 import { useState } from 'react';
+import { getRecipientEmail } from '../utils/getRecipientEmail';
 
 const Container = styled.div``;
 const Header = styled.div`
@@ -114,12 +115,15 @@ const ChatScreen = ({ chat, messages }) => {
 
     setInput('');
   };
+
+  const recipientEmail = getRecipientEmail(chat.users, user);
+
   return (
     <Container>
       <Header>
         <Avatar />
         <HeaderInfo>
-          <h3>Rec Email</h3>
+          <h3>{recipientEmail}</h3>
           <span>Last Seen</span>
         </HeaderInfo>
         <HeaderIcons>
